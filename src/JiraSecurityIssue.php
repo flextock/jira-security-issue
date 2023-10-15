@@ -210,34 +210,6 @@ class JiraSecurityIssue
             throw new RuntimeException("Could not create issue: {$t->getMessage()}");
         }
 
-        $addedWatchers = [];
-        $notFoundWatchers = [];
-
-        foreach ($this->watchers as $watcher) {
-            $account = $this->findUser($watcher);
-
-            if (!$account) {
-                $notFoundWatchers[] = $watcher;
-
-                continue;
-            }
-
-            $this->issueService->addWatcher($ret->key, $account->accountId);
-            $addedWatchers[] = $account;
-        }
-
-        $commentText = $addedWatchers
-            ? \sprintf(self::WATCHERS_TEXT, $this->formatUsers($addedWatchers))
-            : self::NO_WATCHERS_TEXT;
-
-        if ($notFoundWatchers) {
-            $commentText .= "\n\n" . \sprintf(self::NOT_FOUND_WATCHERS_TEXT, $this->formatQuoted($notFoundWatchers));
-        }
-
-        $comment = $this->createComment($commentText);
-
-        $this->issueService->addComment($ret->key, $comment);
-
         return $ret->key;
     }
 
